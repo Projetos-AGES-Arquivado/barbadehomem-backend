@@ -10,10 +10,27 @@ const messaging = admin.messaging();
 exports.sendNotificationOnUpdateAppointment = functions.firestore
   .document('/appointments/{id}')
   .onUpdate(async (snapshot) => {
-    const changedStatus = snapshot.before.get('status') !== snapshot.after.get('status');
-    const newStatusIsBooked = snapshot.after.get('status') === 'booked';
+    const newStatus = snapshot.after.get('status');
+    const changedStatus = snapshot.before.get('status') !== newStatus;
 
-    if (changedStatus && newStatusIsBooked) {
+    const notificationMappedByStatus = {
+      booked: {
+        title: 'Sua solicitação foi aprovada!',
+        body: 'Acesse o aplicativo para visualizar mais detalhes',
+      },
+      done: {
+        title: 'Sua solicitação foi concluída!',
+        body: 'Acesse o aplicativo para visualizar mais detalhes',
+      },
+      canceled: {
+        title: 'Sua solicitação foi cancelada!',
+        body: 'Acesse o aplicativo para visualizar mais detalhes',
+      },
+    }
+
+    const notification = notificationMappedByStatus[newStatus];
+
+    if (changedStatus && notification) {
       const user = await firestore
         .collection('users')
         .doc(snapshot.after.get('userId'))
@@ -22,10 +39,7 @@ exports.sendNotificationOnUpdateAppointment = functions.firestore
       const deviceToken = user.get('deviceToken');
       if (deviceToken) {
         await messaging.sendToDevice(deviceToken, {
-          notification: {
-            title: 'Sua solicitação foi aprovada!',
-            body: 'Acesse o aplicativo para visualizar os detalhes',
-          },
+          notification,
         });
       }
     }
