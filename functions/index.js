@@ -15,16 +15,12 @@ exports.sendNotificationOnUpdateAppointment = functions.firestore
 
     const notificationMappedByStatus = {
       booked: {
-        title: 'Sua solicitação foi aprovada!',
-        body: 'Acesse o aplicativo para visualizar mais detalhes',
-      },
-      done: {
-        title: 'Sua solicitação foi concluída!',
-        body: 'Acesse o aplicativo para visualizar mais detalhes',
+        title: 'Confirmação do serviço',
+        body: 'Seu horário está ok. Agora é só esperar que enviaremos um barbeiro até você.',
       },
       canceled: {
-        title: 'Sua solicitação foi cancelada!',
-        body: 'Acesse o aplicativo para visualizar mais detalhes',
+        title: 'Remarcação',
+        body: 'Neste horário não podemos atende-lo. Entraremos em contato para remarca-lo. Aguarde!',
       },
     }
 
